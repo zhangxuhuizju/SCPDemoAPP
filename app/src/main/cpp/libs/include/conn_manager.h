@@ -32,7 +32,7 @@ struct addr_port{
 class ConnManager{
 public:
 
-    static uint16_t heartBeatTime;
+    static int heartBeatTime;
     /**
      * get the fake connection link pointer by connection ID
      * \param connid the 32 bits connection id

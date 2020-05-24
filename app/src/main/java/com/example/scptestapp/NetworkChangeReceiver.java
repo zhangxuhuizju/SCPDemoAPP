@@ -11,6 +11,7 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        System.out.println(System.currentTimeMillis());
         if (!isNetworkConnected(context))
             return;
         Toast.makeText(context, "changeNetwork!", Toast.LENGTH_LONG);

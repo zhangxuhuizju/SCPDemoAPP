@@ -28,7 +28,6 @@ void rst_handle(){
         scp_send_keep_alive(fc);
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
     }
-    LOGI("reconnect ok!!");
     //do resend, send heart beat is ok
 }
 
@@ -91,6 +90,10 @@ void service_thread(int op){
                 finish_thr.detach();
             }
         } else if (stat == 9) {
+            if(rst_flag)
+                LOGI("reconnect finished!");
+            else
+                LOGI("recv heartBeat echo!");
             rst_flag = false;
         }
     }
@@ -120,9 +123,10 @@ Java_com_example_scptestapp_FirstTest_startTest(JNIEnv* env, jobject /* this */t
 
     scp_bind(inet_addr(LOCAL_ADDR),LOCAL_PORT_USED);
 
-    if (time > 180*1000)
+    if (time > 60*1000)
         ConnManager::heartBeatTime = time * 1000;
 
+    LOGI("%d", ConnManager::heartBeatTime);
     std::thread ser(service_thread, op);
 
     ser.detach();

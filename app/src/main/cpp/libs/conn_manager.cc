@@ -13,7 +13,7 @@ bool ConnManager::tcp_enable = false;
 bool ConnManager::isserver = true;
 bool ConnManager::encrypto_enable = false;
 uint64_t ConnManager::min_rtt = 20;
-uint16_t ConnManager::heartBeatTime = 180000;
+int ConnManager::heartBeatTime = 30000;
 
 
 //-------------------------------------------------------
