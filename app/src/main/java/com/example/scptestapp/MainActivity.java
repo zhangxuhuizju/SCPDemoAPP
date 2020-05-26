@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         System.loadLibrary("native-lib");
     }
 
-    final static String IP = "49.4.51.131";
+    final static String IP = "49.4.5.166";
 
 //    LoadingDialog loadingDialog;
 //    private void doLoading(){

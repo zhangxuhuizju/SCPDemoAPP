@@ -32,6 +32,8 @@ struct addr_port{
 class ConnManager{
 public:
 
+    static bool net_connect;
+
     static int heartBeatTime;
     /**
      * get the fake connection link pointer by connection ID
@@ -201,6 +203,7 @@ private:
 class FakeConnection{
     //friend void packet_resend_thread(FakeConnection* fc, size_t bufnum);
 public:
+    int keep_alive = 10;
     /**
      * default constructor
      */ 
@@ -357,6 +360,7 @@ public:
     bool is_key_set(){ return is_set_key; }
 
     void key_set_ok() { is_set_key = true; }
+
 private:
     // -- protocal options --
     bool using_tcp; /** choose if to use fake tcp header*/ 

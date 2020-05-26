@@ -14,6 +14,7 @@ bool ConnManager::isserver = true;
 bool ConnManager::encrypto_enable = false;
 uint64_t ConnManager::min_rtt = 20;
 int ConnManager::heartBeatTime = 30000;
+bool ConnManager::net_connect = true;
 
 
 //-------------------------------------------------------
@@ -100,10 +101,13 @@ uint32_t ConnManager::get_connid(addr_port addr){
 
 void ConnManager::resend_and_clear() {
     //LOG(INFO) << "resend and clear thread start";
+    uint64_t active;
+    uint64_t now;
+    uint64_t gap;
     while (true) {
         if (!min_rtt)
             return;
-        std::this_thread::sleep_for(std::chrono::milliseconds(min_rtt));
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
         std::vector<FakeConnection*> conns = get_all_connections();
         for (FakeConnection *conn : conns) {
             if (!conn->is_established()) {
@@ -111,11 +115,12 @@ void ConnManager::resend_and_clear() {
                 reply_syn(conn->get_addr(), conn->connection_id);
                 continue;
             }
-            uint64_t now = getMillis();   
-            uint64_t active = conn->get_last_acitve_time();
-            uint64_t gap = now > active ? now - active : 0;
-            if(!ConnManager::isserver && gap > ConnManager::heartBeatTime){
+            now = getMillis();
+            active = conn->get_last_acitve_time();
+            gap = now > active ? now - active : 0;
+            if(ConnManager::net_connect && conn->keep_alive && gap > ConnManager::heartBeatTime){
                 conn->pkt_send(nullptr, 0);
+                conn->keep_alive--;
             } else {
                 conn->resend_lock.lock();
                 for (auto i = conn->resend_map.cbegin(); i != conn->resend_map.cend(); ++i){
@@ -295,6 +300,7 @@ int FakeConnection::on_pkt_recv(void* buf,size_t len,addr_port srcaddr){ // udp 
             sendto(ConnManager::local_send_fd,heart_beat_buf,sendsz,0,(struct sockaddr*) &remote_sin,sizeof(remote_sin));
             return 3;
         } else if (scp->ack == 0x7fff && scp->pktnum == 0x7fff) {
+            keep_alive = 10;
             return 4;
         }
     }

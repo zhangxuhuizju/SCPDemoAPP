@@ -14,7 +14,7 @@
 #define LOCAL_ADDR "0.0.0.0"
 static bool rst_flag = false;
 
-static const int packet[7] = {99, 99, 11, 11, 999, 999, 9};
+static const int packet[7] = {4999, 99, 11, 11, 999, 999, 9};
 
 void update();
 void finish();
@@ -28,6 +28,8 @@ void rst_handle(){
         scp_send_keep_alive(fc);
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
     }
+    ConnManager::net_connect = true;
+    fc->keep_alive = 10;
     //do resend, send heart beat is ok
 }
 
@@ -97,6 +99,11 @@ void service_thread(int op){
             rst_flag = false;
         }
     }
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_example_scptestapp_NetworkChangeReceiver_netClosed(JNIEnv* env, jobject /* this */thiz) {
+    ConnManager::net_connect = false;
 }
 
 extern "C" JNIEXPORT void JNICALL
